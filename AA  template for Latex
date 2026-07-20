@@ -1,0 +1,258 @@
+
+\documentclass[manuscript,review,anonymous]{acmart}
+
+%% ------------------------------------------------------------
+%% Packages
+%% ------------------------------------------------------------
+
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{url}
+
+%% ------------------------------------------------------------
+%% Metadata
+%% ------------------------------------------------------------
+
+\title{Title of the Paper}
+
+%% Anonymous review:
+%% Do not add author information for double-blind review.
+
+\renewcommand{\shortauthors}{Anonymous}
+
+%% ------------------------------------------------------------
+%% CCS Concepts
+%% Replace these later using ACM CCS generator
+%% ------------------------------------------------------------
+
+\begin{CCSXML}
+<ccs2012>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Human-centered computing}
+\ccsdesc[300]{Human computer interaction}
+
+%% ------------------------------------------------------------
+%% Keywords
+%% ------------------------------------------------------------
+
+\keywords{
+Usability,
+Utility,
+Human--Computer Interaction,
+Design Science,
+Prompt Engineering,
+Large Language Models
+}
+
+%% ------------------------------------------------------------
+%% Begin document
+%% ------------------------------------------------------------
+
+\begin{document}
+
+%% ------------------------------------------------------------
+%% Abstract
+%% ------------------------------------------------------------
+
+\begin{abstract}
+
+Write a concise abstract here.
+
+Recommended structure:
+
+Purpose
+
+Methodology
+
+Results
+
+Contribution
+
+Conclusions
+
+\end{abstract}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Write your introduction.
+
+Suggested structure:
+
+\begin{itemize}
+\item Research motivation
+\item Practical problem
+\item Research gap
+\item Research objective
+\item Research questions
+\item Contributions
+\item Paper organization
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Background}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Present theoretical background.
+
+Possible subsections:
+
+\subsection{Human--Computer Interaction}
+
+\subsection{Usability}
+
+\subsection{Utility}
+
+\subsection{Prompt Engineering}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Related Work}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Review previous literature.
+
+Example subsection structure:
+
+\subsection{Previous usability evaluation methods}
+
+\subsection{Prompt engineering research}
+
+\subsection{Large Language Models}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Proposed Design Model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Describe the proposed model.
+
+Suggested subsections:
+
+\subsection{Architecture}
+
+\subsection{Design principles}
+
+\subsection{Workflow}
+
+\subsection{Expected benefits}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Research Methodology}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Describe
+
+\begin{itemize}
+\item Research philosophy
+\item Research strategy
+\item Design science process
+\item Experimental design
+\item Participants
+\item Materials
+\item Ethical considerations
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Describe
+
+\begin{itemize}
+\item Prototype
+\item Software
+\item Hardware
+\item LLM configuration
+\item Experimental setup
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Evaluation}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Explain
+
+\begin{itemize}
+\item Evaluation metrics
+\item QQ metric
+\item Questionnaires
+\item Data collection
+\item Statistical analysis
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Results}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Present results.
+
+Example placeholders:
+
+\subsection{Quantitative Results}
+
+\subsection{Qualitative Results}
+
+\subsection{Summary of Findings}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discussion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Discuss
+
+\begin{itemize}
+\item Interpretation
+\item Comparison with previous work
+\item Practical implications
+\item Scientific implications
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Limitations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Discuss limitations.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Future Work}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Describe future research.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusion}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Summarize
+
+\begin{itemize}
+\item Research objective
+\item Main findings
+\item Contributions
+\item Final conclusions
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Acknowledgments
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Leave empty for anonymous review.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% References
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\end{document}
