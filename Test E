@@ -1,0 +1,348 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cross-LLM Prompt Studio v2.0</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:Segoe UI,Arial,sans-serif;
+    background:#ececec;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+header{
+    background:#1f4e79;
+    color:white;
+    padding:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+header h1{
+    font-size:24px;
+}
+
+#toolbar{
+    display:flex;
+    gap:8px;
+}
+
+button{
+    padding:8px 14px;
+    cursor:pointer;
+}
+
+#workspace{
+    flex:1;
+    display:grid;
+    grid-template-columns:420px 1fr;
+}
+
+#left{
+    background:white;
+    overflow:auto;
+    padding:20px;
+    border-right:1px solid #ccc;
+}
+
+#right{
+    background:#f5f5f5;
+    overflow:auto;
+    padding:20px;
+}
+
+.panel{
+    border:1px solid #ccc;
+    margin-bottom:20px;
+}
+
+.panel h2{
+    background:#efefef;
+    padding:10px;
+    font-size:18px;
+}
+
+.panel .body{
+    padding:12px;
+}
+
+input,
+textarea{
+    width:100%;
+    padding:10px;
+    margin-top:6px;
+}
+
+textarea{
+    min-height:120px;
+}
+
+.preview{
+    background:white;
+    border:1px solid #ccc;
+    padding:20px;
+    min-height:700px;
+    white-space:pre-wrap;
+    font-family:Consolas,monospace;
+}
+
+footer{
+    padding:10px;
+    background:#f2f2f2;
+    border-top:1px solid #ccc;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<h1>Cross-LLM Prompt Studio</h1>
+
+<div id="toolbar">
+
+<button id="copyBtn">Copy</button>
+
+<button id="clearBtn">Clear</button>
+
+<button id="saveBtn">Save</button>
+
+<button id="loadBtn">Load</button>
+
+</div>
+
+</header>
+
+<div id="workspace">
+
+<div id="left">
+
+<div class="panel">
+
+<h2>Task</h2>
+
+<div class="body">
+
+<input id="task">
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Exemplar</h2>
+
+<div class="body">
+
+<textarea id="example"></textarea>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Role</h2>
+
+<div class="body">
+
+<input id="role">
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Style</h2>
+
+<div class="body">
+
+<input id="style">
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Additional Information</h2>
+
+<div class="body">
+
+<textarea id="additional"></textarea>
+
+</div>
+
+</div>
+
+</div>
+
+<div id="right">
+
+<div class="preview" id="preview">
+
+Waiting...
+
+</div>
+
+</div>
+
+</div>
+
+<footer>
+
+Cross-LLM Prompt Studio v2.0
+
+</footer>
+
+<script>
+
+const App={
+
+model:{
+task:"",
+example:"",
+role:"",
+style:"",
+additional:""
+},
+
+init(){
+
+["task","example","role","style","additional"]
+
+.forEach(id=>{
+
+document.getElementById(id)
+
+.addEventListener("input",()=>{
+
+App.update();
+
+});
+
+});
+
+copyBtn.onclick=()=>{
+
+navigator.clipboard.writeText(preview.textContent);
+
+};
+
+clearBtn.onclick=()=>{
+
+task.value="";
+example.value="";
+role.value="";
+style.value="";
+additional.value="";
+App.update();
+
+};
+
+saveBtn.onclick=()=>{
+
+localStorage.setItem(
+
+"PromptStudio",
+
+JSON.stringify(App.model)
+
+);
+
+};
+
+loadBtn.onclick=()=>{
+
+const d=localStorage.getItem("PromptStudio");
+
+if(!d) return;
+
+App.model=JSON.parse(d);
+
+task.value=App.model.task;
+example.value=App.model.example;
+role.value=App.model.role;
+style.value=App.model.style;
+additional.value=App.model.additional;
+
+App.render();
+
+};
+
+App.update();
+
+},
+
+update(){
+
+App.model.task=task.value;
+App.model.example=example.value;
+App.model.role=role.value;
+App.model.style=style.value;
+App.model.additional=additional.value;
+
+App.render();
+
+},
+
+render(){
+
+preview.textContent=
+
+`[TASK]
+
+${App.model.task}
+
+---------------------------------
+
+[EXEMPLAR]
+
+${App.model.example}
+
+---------------------------------
+
+[ROLE]
+
+${App.model.role}
+
+---------------------------------
+
+[STYLE]
+
+${App.model.style}
+
+---------------------------------
+
+[ADDITIONAL INFORMATION]
+
+${App.model.additional}`;
+
+}
+
+};
+
+window.onload=App.init;
+
+</script>
+
+</body>
+</html>
