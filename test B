@@ -1,0 +1,598 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Cross-LLM Prompt Template Designer</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:Segoe UI,Arial,sans-serif;
+    background:#ececec;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+
+}
+
+header{
+
+    background:#1f4e79;
+    color:white;
+    padding:15px 20px;
+
+}
+
+header h1{
+
+    font-size:26px;
+    margin-bottom:10px;
+
+}
+
+.toolbar{
+
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+
+}
+
+.toolbar button{
+
+    padding:10px 18px;
+    border:none;
+    border-radius:6px;
+    background:white;
+    color:#1f4e79;
+    cursor:pointer;
+    font-weight:bold;
+
+}
+
+.toolbar button:hover{
+
+    background:#dcecff;
+
+}
+
+#status{
+
+    margin-left:auto;
+    align-self:center;
+    font-size:13px;
+    color:#d0ffd0;
+
+}
+
+.container{
+
+    flex:1;
+
+    display:grid;
+
+    grid-template-columns:420px 1fr;
+
+    overflow:hidden;
+
+}
+
+.left{
+
+    overflow:auto;
+    background:white;
+    padding:20px;
+    border-right:1px solid #cfcfcf;
+
+}
+
+.right{
+
+    overflow:auto;
+    background:#f8f8f8;
+    padding:20px;
+
+}
+
+.section{
+
+    background:white;
+
+    border:1px solid #d8d8d8;
+
+    border-radius:10px;
+
+    margin-bottom:18px;
+
+    overflow:hidden;
+
+}
+
+.sectionHeader{
+
+    background:#f3f3f3;
+
+    padding:12px 15px;
+
+    font-weight:bold;
+
+    font-size:17px;
+
+}
+
+.sectionBody{
+
+    padding:15px;
+
+}
+
+input[type=text],
+textarea,
+select{
+
+    width:100%;
+
+    padding:10px;
+
+    border:1px solid #cccccc;
+
+    border-radius:6px;
+
+    font-size:15px;
+
+}
+
+textarea{
+
+    resize:vertical;
+
+    min-height:120px;
+
+}
+
+.counter{
+
+    text-align:right;
+
+    color:#888;
+
+    font-size:12px;
+
+    margin-top:4px;
+
+}
+
+.outputGrid{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:8px;
+
+}
+
+.outputGrid label{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:5px;
+
+}
+
+.preview{
+
+    background:white;
+
+    border:1px solid #cccccc;
+
+    border-radius:8px;
+
+    padding:25px;
+
+    min-height:900px;
+
+    font-family:Consolas,monospace;
+
+    white-space:pre-wrap;
+
+    line-height:1.5;
+
+}
+
+.previewTitle{
+
+    font-size:22px;
+
+    margin-bottom:20px;
+
+    color:#1f4e79;
+
+}
+
+footer{
+
+    background:#f2f2f2;
+
+    border-top:1px solid #cccccc;
+
+    padding:8px 20px;
+
+    font-size:13px;
+
+    color:#555;
+
+}
+
+/* ---------- Dark Mode ---------- */
+
+body.dark{
+
+    background:#1e1e1e;
+
+}
+
+body.dark .left{
+
+    background:#2b2b2b;
+
+    color:white;
+
+}
+
+body.dark .right{
+
+    background:#252526;
+
+}
+
+body.dark .section{
+
+    background:#333;
+
+    border-color:#555;
+
+}
+
+body.dark .sectionHeader{
+
+    background:#444;
+
+}
+
+body.dark input,
+
+body.dark textarea{
+
+    background:#555;
+
+    color:white;
+
+    border-color:#777;
+
+}
+
+body.dark .preview{
+
+    background:#111;
+
+    color:#00ff88;
+
+    border-color:#555;
+
+}
+
+body.dark footer{
+
+    background:#111;
+
+    color:#bbb;
+
+}
+
+@media(max-width:900px){
+
+.container{
+
+grid-template-columns:1fr;
+
+}
+
+.left{
+
+border-right:none;
+
+border-bottom:1px solid #cccccc;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>Cross-LLM Prompt Template Designer</h1>
+
+<div class="toolbar">
+
+<button id="copyBtn">📋 Copy Prompt</button>
+
+<button id="clearBtn">🗑 Clear</button>
+
+<button id="saveBtn">💾 Save</button>
+
+<button id="loadBtn">📂 Load</button>
+
+<button id="darkBtn">🌙 Dark Mode</button>
+
+<button id="exportBtn">⬇ Export</button>
+
+<span id="status">
+Ready
+</span>
+
+</div>
+
+</header>
+
+<div class="container">
+
+<div class="left">
+
+<div class="section">
+
+<div class="sectionHeader">
+
+Define Task
+
+</div>
+
+<div class="sectionBody">
+
+<input
+id="task"
+type="text"
+placeholder="Describe the task...">
+
+<div
+id="taskCounter"
+class="counter">
+
+0 characters
+
+</div>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="sectionHeader">
+
+Add Exemplar
+
+</div>
+
+<div class="sectionBody">
+
+<textarea
+id="example"
+placeholder="Example prompt..."></textarea>
+
+<div
+id="exampleCounter"
+class="counter">
+
+0 characters
+
+</div>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="sectionHeader">
+
+Output Format
+
+</div>
+
+<div class="sectionBody">
+
+<div class="outputGrid">
+
+<label><input type="checkbox" value="TXT">TXT</label>
+<label><input type="checkbox" value="PDF">PDF</label>
+<label><input type="checkbox" value="JSON">JSON</label>
+
+<label><input type="checkbox" value="XML">XML</label>
+<label><input type="checkbox" value="MP3">MP3</label>
+<label><input type="checkbox" value="WAV">WAV</label>
+
+<label><input type="checkbox" value="MP4">MP4</label>
+<label><input type="checkbox" value="JPG">JPG</label>
+<label><input type="checkbox" value="JPEG">JPEG</label>
+
+<label><input type="checkbox" value="PNG">PNG</label>
+<label><input type="checkbox" value="GIF">GIF</label>
+<label><input type="checkbox" value="STL">STL</label>
+
+<label><input type="checkbox" value="OBJ">OBJ</label>
+<label><input type="checkbox" value="FBX">FBX</label>
+<label><input type="checkbox" value="CSV">CSV</label>
+
+<label><input type="checkbox" value="XLSX">XLSX</label>
+<label><input type="checkbox" value="SQL">SQL</label>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="sectionHeader">
+
+Style
+
+</div>
+
+<div class="sectionBody">
+
+<input
+id="style"
+type="text"
+placeholder="Scientific, Professional...">
+
+<div
+id="styleCounter"
+class="counter">
+
+0 characters
+
+</div>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="sectionHeader">
+
+Role
+
+</div>
+
+<div class="sectionBody">
+
+<input
+id="role"
+type="text"
+placeholder="Act as...">
+
+<div
+id="roleCounter"
+class="counter">
+
+0 characters
+
+</div>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="sectionHeader">
+
+Additional Information
+
+</div>
+
+<div class="sectionBody">
+
+<textarea
+id="additional"
+placeholder="Additional context..."></textarea>
+
+<div
+id="additionalCounter"
+class="counter">
+
+0 characters
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="right">
+
+<div class="previewTitle">
+
+Generated Prompt
+
+</div>
+
+<div
+id="preview"
+class="preview">
+
+Waiting for JavaScript engine...
+
+</div>
+
+</div>
+
+</div>
+
+<footer>
+
+Cross-LLM Prompt Template Designer • Version 1.0 Foundation
+
+</footer>
+
+<script>
+
+/*
+-----------------------------------------
+PART B STARTS HERE
+-----------------------------------------
+
+The JavaScript engine will be added
+in the next step.
+
+It will include:
+
+✓ Live Prompt Rendering
+
+✓ Save / Load
+
+✓ Copy Prompt
+
+✓ Clear Prompt
+
+✓ Auto Save
+
+✓ Character Counters
+
+✓ Dark Mode
+
+✓ Export
+
+✓ Modular data model
+
+*/
+
+</script>
+
+</body>
+</html>
