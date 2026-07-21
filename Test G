@@ -1,0 +1,943 @@
+
+<header>
+
+<h1>Cross-LLM Prompt Chaining Builder</h1>
+
+</header>
+
+<main>
+
+
+
+
+
+
+
+
+
+<div id="left">
+
+<div class="panel">
+
+<h2>Task</h2>
+
+<div class="body">
+
+<textarea
+id="task"
+rows="6"
+placeholder="Describe the task..."></textarea>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Role</h2>
+
+<div class="body">
+
+<input
+id="role"
+type="text"
+placeholder="Example: Senior Software Engineer">
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Style</h2>
+
+<div class="body">
+
+
+
+
+
+
+
+
+<input
+id="style"
+type="text"
+placeholder="Example: Professional">
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Additional Information</h2>
+
+<div class="body">
+
+<textarea
+id="additional"
+rows="6"></textarea>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Output Format</h2>
+
+<div class="body" id="formats">
+
+<!-- Generated automatically -->
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Attachments</h2>
+
+<div class="body">
+
+<input
+type="file"
+id="attachmentInput"
+multiple>
+
+<br><br>
+
+<div id="attachmentList">
+
+No files selected.
+
+</div>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>Exemplars</h2>
+
+<div class="body">
+
+<button
+id="addExampleBtn"
+type="button">
+
+➕ Add Exemplar
+
+</button>
+
+<br><br>
+
+<div id="exampleContainer">
+
+<textarea
+
+rows="6"
+
+class="exampleBox"
+
+placeholder="Example 1">
+
+</textarea>
+
+</div>
+
+</div>
+
+</div>
+
+<button id="copyBtn">
+
+Copy Prompt
+
+</button>
+
+<button id="clearBtn">
+
+Clear
+
+</button>
+
+</div>
+
+<div id="right">
+
+<div class="panel">
+
+<h2>Prompt Preview</h2>
+
+<div class="body">
+
+<pre id="preview"></pre>
+
+</div>
+
+</div>
+
+</div>
+
+</main>
+
+<script>
+
+const App={
+
+
+.dark{
+
+    background:#222;
+
+    color:#eee;
+
+}
+
+.dark .panel{
+
+    background:#333;
+
+    color:white;
+
+}
+
+.dark textarea,
+.dark input{
+
+    background:#444;
+
+    color:white;
+
+    border:1px solid #666;
+
+}
+
+
+
+
+model:{
+
+task:"",
+
+role:"",
+
+style:"",
+
+additional:"",
+
+examples:[],
+
+formats:[],
+
+attachments:[]
+
+},
+
+availableFormats:[
+
+"TXT",
+"PDF",
+"JSON",
+"XML",
+"CSV",
+"SQL",
+"MP3",
+"WAV",
+"MP4",
+"PNG",
+"JPG",
+"JPEG",
+"GIF",
+"STL",
+"OBJ",
+"FBX",
+"XLSX"
+
+],
+
+init(){
+
+    this.renderFormats();
+
+    this.bindEvents();
+
+    this.render();
+
+},
+
+renderFormats(){
+
+    const container=document.getElementById("formats");
+
+    this.availableFormats.forEach(fmt=>{
+
+        container.insertAdjacentHTML(
+
+            "beforeend",
+
+            `<label>
+                <input
+                    type="checkbox"
+                    value="${fmt}">
+                ${fmt}
+            </label><br>`
+
+        );
+
+    });
+
+},
+
+bindEvents(){
+
+    task.addEventListener(
+        "input",
+        ()=>this.update()
+    );
+
+    role.addEventListener(
+        "input",
+        ()=>this.update()
+    );
+
+    style.addEventListener(
+        "input",
+        ()=>this.update()
+    );
+
+    additional.addEventListener(
+        "input",
+        ()=>this.update()
+    );
+
+    attachmentInput.addEventListener(
+        "change",
+        ()=>this.update()
+    );
+
+    addExampleBtn.onclick=()=>this.addExample();
+
+    copyBtn.onclick=()=>this.copyPrompt();
+
+    clearBtn.onclick=()=>this.clear();
+
+    document.addEventListener(
+
+        "change",
+
+        e=>{
+
+            if(e.target.type==="checkbox"){
+
+                this.update();
+
+            }
+
+        }
+
+    );
+
+},
+
+
+
+
+update(){
+
+    this.model.task=task.value.trim();
+
+    this.model.role=role.value.trim();
+
+    this.model.style=style.value.trim();
+
+    this.model.additional=additional.value.trim();
+
+    this.model.examples=this.readExamples();
+
+    this.model.formats=this.readFormats();
+
+    this.model.attachments=[...attachmentInput.files];
+
+    this.render();
+
+},
+
+readExamples(){
+
+    return [...document.querySelectorAll(".exampleBox")]
+
+        .map(box=>box.value.trim())
+
+        .filter(text=>text.length>0);
+
+},
+
+readFormats(){
+
+    return [...document.querySelectorAll("#formats input:checked")]
+
+        .map(box=>box.value);
+
+},
+
+render(){
+
+    this.renderAttachmentList();
+
+    preview.textContent=this.buildPrompt();
+
+},
+
+renderAttachmentList(){
+
+    if(this.model.attachments.length===0){
+
+        attachmentList.textContent="No files selected.";
+
+        return;
+
+    }
+
+    let html="<ul>";
+
+    this.model.attachments.forEach(file=>{
+
+        html+=`
+        <li>
+            ${file.name}
+            (${Math.round(file.size/1024)} KB)
+        </li>
+        `;
+
+    });
+
+    html+="</ul>";
+
+    attachmentList.innerHTML=html;
+
+},
+
+addExample(){
+
+    const textarea=document.createElement("textarea");
+
+    textarea.rows=6;
+
+    textarea.className="exampleBox";
+
+    textarea.placeholder=
+
+        "Example "+
+
+        (document.querySelectorAll(".exampleBox").length+1);
+
+    textarea.addEventListener(
+
+        "input",
+
+        ()=>this.update()
+
+    );
+
+    exampleContainer.appendChild(textarea);
+
+},
+
+buildPrompt(){
+
+    const m=this.model;
+
+    return `
+
+[TASK]
+
+${m.task}
+
+------------------------------------------------------------
+
+[ROLE]
+
+${m.role}
+
+------------------------------------------------------------
+
+[STYLE]
+
+${m.style}
+
+------------------------------------------------------------
+
+[EXEMPLARS]
+
+${
+
+m.examples.length
+
+?
+
+m.examples.map(
+
+(example,index)=>
+
+`Example ${index+1}
+
+${example}`
+
+).join(
+
+"\n\n-----------------------------\n\n"
+
+)
+
+:
+
+"(none)"
+
+}
+
+------------------------------------------------------------
+
+[ADDITIONAL INFORMATION]
+
+${m.additional}
+
+------------------------------------------------------------
+
+[OUTPUT FORMAT]
+
+${
+
+m.formats.length
+
+?
+
+m.formats.join(", ")
+
+:
+
+"(none)"
+
+}
+
+------------------------------------------------------------
+
+[ATTACHMENTS]
+
+${
+
+m.attachments.length
+
+?
+
+m.attachments
+
+.map(file=>file.name)
+
+.join("\n")
+
+:
+
+"(none)"
+
+}
+
+`;
+
+},
+
+copyPrompt(){
+
+    navigator.clipboard.writeText(
+
+        this.buildPrompt()
+
+    );
+
+    alert("Prompt copied.");
+
+},
+
+clear(){
+
+    task.value="";
+
+    role.value="";
+
+    style.value="";
+
+    additional.value="";
+
+    attachmentInput.value="";
+
+    document
+
+        .querySelectorAll(
+
+            "#formats input"
+
+        )
+
+        .forEach(
+
+            c=>c.checked=false
+
+        );
+
+    exampleContainer.innerHTML=`
+
+<textarea
+
+rows="6"
+
+class="exampleBox"
+
+placeholder="Example 1">
+
+</textarea>
+
+`;
+
+    document
+
+        .querySelector(".exampleBox")
+
+        .addEventListener(
+
+            "input",
+
+            ()=>this.update()
+
+        );
+
+    this.update();
+
+}
+
+};
+
+
+
+
+/*****************************************************************
+ LOCAL STORAGE
+*****************************************************************/
+
+storageKey:"pusax-project",
+
+saveProject(){
+
+    localStorage.setItem(
+
+        this.storageKey,
+
+        JSON.stringify(this.model)
+
+    );
+
+},
+
+loadProject(){
+
+    const json=localStorage.getItem(this.storageKey);
+
+    if(!json)return;
+
+    try{
+
+        this.model=JSON.parse(json);
+
+        task.value=this.model.task||"";
+        role.value=this.model.role||"";
+        style.value=this.model.style||"";
+        additional.value=this.model.additional||"";
+
+        document
+            .querySelectorAll(".exampleBox")
+            .forEach(e=>e.remove());
+
+        this.model.examples.forEach((text,index)=>{
+
+            const box=document.createElement("textarea");
+
+            box.rows=6;
+
+            box.className="exampleBox";
+
+            box.placeholder="Example "+(index+1);
+
+            box.value=text;
+
+            box.addEventListener(
+
+                "input",
+
+                ()=>this.update()
+
+            );
+
+            exampleContainer.appendChild(box);
+
+        });
+
+        document
+
+        .querySelectorAll("#formats input")
+
+        .forEach(box=>{
+
+            box.checked=
+
+                this.model.formats.includes(
+
+                    box.value
+
+                );
+
+        });
+
+        this.render();
+
+    }
+
+    catch(e){
+
+        console.log(e);
+
+    }
+
+},
+
+/*****************************************************************
+ PROMPT LIBRARY
+*****************************************************************/
+
+saveNamedPrompt(){
+
+    const name=prompt(
+
+        "Prompt name?"
+
+    );
+
+    if(!name)return;
+
+    const lib=
+
+    JSON.parse(
+
+        localStorage.getItem(
+
+            "promptLibrary"
+
+        )||"{}"
+
+    );
+
+    lib[name]=this.model;
+
+    localStorage.setItem(
+
+        "promptLibrary",
+
+        JSON.stringify(lib)
+
+    );
+
+    alert("Saved.");
+
+},
+
+loadNamedPrompt(){
+
+    const lib=
+
+    JSON.parse(
+
+        localStorage.getItem(
+
+            "promptLibrary"
+
+        )||"{}"
+
+    );
+
+    const names=
+
+    Object.keys(lib);
+
+    if(names.length===0){
+
+        alert("Library empty.");
+
+        return;
+
+    }
+
+    const name=prompt(
+
+        "Available:\n\n"+
+
+        names.join("\n")
+
+    );
+
+    if(!lib[name])return;
+
+    this.model=lib[name];
+
+    this.loadProject();
+
+},
+
+deleteNamedPrompt(){
+
+    const lib=
+
+    JSON.parse(
+
+        localStorage.getItem(
+
+            "promptLibrary"
+
+        )||"{}"
+
+    );
+
+    const names=
+
+    Object.keys(lib);
+
+    const name=prompt(
+
+        names.join("\n")
+
+    );
+
+    delete lib[name];
+
+    localStorage.setItem(
+
+        "promptLibrary",
+
+        JSON.stringify(lib)
+
+    );
+
+},
+
+/*****************************************************************
+ DARK MODE
+*****************************************************************/
+
+toggleDarkMode(){
+
+    document.body.classList.toggle(
+
+        "dark"
+
+    );
+
+    localStorage.setItem(
+
+        "darkMode",
+
+        document.body.classList.contains(
+
+            "dark"
+
+        )
+
+    );
+
+},
+
+restoreDarkMode(){
+
+    if(
+
+        localStorage.getItem(
+
+            "darkMode"
+
+        )==="true"
+
+    ){
+
+        document.body.classList.add(
+
+            "dark"
+
+        );
+
+    }
+
+},
+
+/*****************************************************************
+ EXPORT JSON
+*****************************************************************/
+
+exportJSON(){
+
+    const blob=new Blob(
+
+        [
+
+            JSON.stringify(
+
+                this.model,
+
+                null,
+
+                2
+
+            )
+
+        ],
+
+        {
+
+            type:"application/json"
+
+        }
+
+    );
+
+    const a=document.createElement("a");
+
+    a.href=URL.createObjectURL(blob);
+
+    a.download="prompt.json";
+
+    a.click();
+
+},
+
+/*****************************************************************
+ AUTO SAVE
+*****************************************************************/
+
+oldUpdate:update,
+
+update(){
+
+    this.oldUpdate();
+
+    this.saveProject();
+
+}
+
+
+
+App.init();
+
+</script>
+
+</body>
+
+</html>
+
