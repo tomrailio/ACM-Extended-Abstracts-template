@@ -1,0 +1,288 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cross-LLM Prompt Template Designer</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --radius: 10px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      max-width: 1200px;
+      margin: 0 auto 2rem auto;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 900px) {
+      .container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .left, .right {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .section {
+      background: var(--card-bg);
+      padding: 1.25rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .section h2, .right h2 {
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text);
+      background-color: #fff;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    /* Output Format Grid (Chip styling) */
+    .outputGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+      gap: 0.5rem;
+    }
+
+    .outputGrid label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.4rem 0.6rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background-color: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+
+    .outputGrid input[type="checkbox"] {
+      display: none;
+    }
+
+    .outputGrid label:has(input:checked) {
+      background-color: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Preview Panel Sticky Position */
+    .right {
+      position: sticky;
+      top: 1.5rem;
+      height: fit-content;
+    }
+
+    .preview-card {
+      background: var(--card-bg);
+      padding: 1.25rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .preview {
+      white-space: pre-wrap;
+      font-family: "ui-monospace", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.875rem;
+      background-color: #0f172a;
+      color: #f8fafc;
+      padding: 1rem;
+      border-radius: 6px;
+      min-height: 400px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Cross-LLM Prompt Template Designer</h1>
+    <p>Prototype & Structure Modular Prompts Dynamically</p>
+  </header>
+
+  <div class="container">
+    
+    <!-- Left Column: Inputs -->
+    <div class="left">
+      <div class="section">
+        <h2>Define Task</h2>
+        <input id="task" type="text" placeholder="Describe the task...">
+      </div>
+
+      <div class="section">
+        <h2>Add Exemplar</h2>
+        <textarea id="example" placeholder="Write an example prompt..."></textarea>
+      </div>
+
+      <div class="section">
+        <h2>Output Format</h2>
+        <div class="outputGrid">
+          <label><input type="checkbox" value="TXT">TXT</label>
+          <label><input type="checkbox" value="PDF">PDF</label>
+          <label><input type="checkbox" value="JSON">JSON</label>
+          <label><input type="checkbox" value="XML">XML</label>
+          <label><input type="checkbox" value="MP3">MP3</label>
+          <label><input type="checkbox" value="WAV">WAV</label>
+          <label><input type="checkbox" value="MP4">MP4</label>
+          <label><input type="checkbox" value="JPG">JPG</label>
+          <label><input type="checkbox" value="JPEG">JPEG</label>
+          <label><input type="checkbox" value="PNG">PNG</label>
+          <label><input type="checkbox" value="GIF">GIF</label>
+          <label><input type="checkbox" value="STL">STL</label>
+          <label><input type="checkbox" value="OBJ">OBJ</label>
+          <label><input type="checkbox" value="FBX">FBX</label>
+          <label><input type="checkbox" value="CSV">CSV</label>
+          <label><input type="checkbox" value="XLSX">XLSX</label>
+          <label><input type="checkbox" value="SQL">SQL</label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Style</h2>
+        <input id="style" type="text" placeholder="Scientific, Professional...">
+      </div>
+
+      <div class="section">
+        <h2>Role</h2>
+        <input id="role" type="text" placeholder="Act as...">
+      </div>
+
+      <div class="section">
+        <h2>Additional Information</h2>
+        <textarea id="additional" placeholder="Any extra context or constraints..."></textarea>
+      </div>
+    </div>
+
+    <!-- Right Column: Live Output -->
+    <div class="right">
+      <div class="preview-card">
+        <h2>Generated Prompt Template</h2>
+        <div id="preview" class="preview"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const ids = ['task', 'example', 'style', 'role', 'additional'];
+
+    function updatePrompt() {
+      let formats = [];
+
+      document
+        .querySelectorAll("input[type=checkbox]:checked")
+        .forEach(c => formats.push(c.value));
+
+      document.getElementById("preview").textContent = `[TASK]
+${document.getElementById("task").value}
+
+[EXEMPLAR]
+${document.getElementById("example").value}
+
+[OUTPUT FORMAT]
+${formats.join(", ")}
+
+[STYLE]
+${document.getElementById("style").value}
+
+[ROLE]
+${document.getElementById("role").value}
+
+[ADDITIONAL INFORMATION]
+${document.getElementById("additional").value}`;
+    }
+
+    ids.forEach(id => {
+      document.getElementById(id).addEventListener("input", updatePrompt);
+    });
+
+    document
+      .querySelectorAll("input[type=checkbox]")
+      .forEach(c => c.addEventListener("change", updatePrompt));
+
+    // Initial render
+    updatePrompt();
+  </script>
+
+</body>
+</html>
